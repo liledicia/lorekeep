@@ -11,7 +11,7 @@ import { useAuth, useAuthProfileReady, useMutations, useQuery } from 'deepspace'
 import { Check, Sparkles, Trash2, X } from 'lucide-react'
 import { Badge, Button, Input, Textarea, useToast } from '@/components/ui'
 import { SignedInOnly } from './SignInPrompt'
-import { CANON_KIND_LABELS, callAction, type CanonEntry, type CanonKind, type Proposal } from '@/lib/lore'
+import { CANON_KIND_LABELS, callAction, cleanName, type CanonEntry, type CanonKind, type Proposal } from '@/lib/lore'
 
 const KINDS = Object.keys(CANON_KIND_LABELS) as CanonKind[]
 
@@ -149,10 +149,10 @@ function ProposalQueue({
               )}
             </div>
             <p className="mt-1 whitespace-pre-wrap">{p.data.content}</p>
-            {p.data.reason && <p className="mt-1 text-xs italic text-muted-foreground">“{p.data.reason}”</p>}
+            {p.data.reason && <p className="mt-1 border-l-2 border-primary/30 pl-2 text-xs italic text-muted-foreground">{p.data.reason}</p>}
             <div className="mt-2 flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
-                {p.data.source === 'ai' ? 'suggested for' : 'proposed by'} {p.data.proposerName || 'a writer'}
+                {p.data.source === 'ai' ? 'suggested for' : 'proposed by'} {cleanName(p.data.proposerName) || 'a writer'}
               </span>
               <div className="ml-auto flex gap-1.5">
                 {isCreator ? (
@@ -256,7 +256,7 @@ function ProposeForm({ topicId }: { topicId: string }) {
       name: f.name.trim(),
       content: f.content.trim(),
       source: 'member',
-      proposerName: user?.name ?? '',
+      proposerName: cleanName(user?.name),
     })
     f.reset()
   }

@@ -8,7 +8,7 @@ import { useAuthProfileReady, useMutations, useQuery } from 'deepspace'
 import { BookOpen, Plus } from 'lucide-react'
 import { Badge, Button, EmptyState, Input, Textarea, useToast } from '@/components/ui'
 import { SignedInOnly } from '@/components/lore/SignInPrompt'
-import { normalizeTags, parseTags, timeAgo, type Topic } from '@/lib/lore'
+import { cleanName, normalizeTags, parseTags, timeAgo, type Topic } from '@/lib/lore'
 
 export default function HomePage() {
   const { records, status } = useQuery<Topic>('topics', { orderBy: 'createdAt', orderDir: 'desc', limit: 200 })
@@ -72,7 +72,7 @@ export default function HomePage() {
                     </Badge>
                   ))}
                   <span className="ml-auto text-xs text-muted-foreground">
-                    {r.data.creatorName ? `by ${r.data.creatorName} · ` : ''}
+                    {r.data.creatorName ? `by ${cleanName(r.data.creatorName)} · ` : ''}
                     {timeAgo(r.createdAt)}
                   </span>
                 </div>
@@ -119,7 +119,7 @@ function NewTopicForm({ onDone }: { onDone: () => void }) {
         title: title.trim(),
         premise: premise.trim(),
         tags: normalizeTags(tags),
-        creatorName: user?.name ?? '',
+        creatorName: cleanName(user?.name),
       })
       onDone()
       navigate(`/t/${id}`)

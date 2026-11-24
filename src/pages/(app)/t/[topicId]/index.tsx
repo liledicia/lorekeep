@@ -9,7 +9,7 @@ import { ArrowLeft, Feather, PenLine } from 'lucide-react'
 import { Badge, Button, EmptyState, Input, useToast } from '@/components/ui'
 import { CanonPanel } from '@/components/lore/CanonPanel'
 import { SignedInOnly } from '@/components/lore/SignInPrompt'
-import { parseTags, timeAgo, type Passage, type Topic } from '@/lib/lore'
+import { cleanName, parseTags, timeAgo, type Passage, type Topic } from '@/lib/lore'
 
 export default function TopicPage() {
   const { topicId = '' } = useParams()
@@ -51,7 +51,7 @@ export default function TopicPage() {
             </Badge>
           ))}
           <span className="text-xs text-muted-foreground">
-            created by {topic.data.creatorName || 'a writer'}
+            created by {cleanName(topic.data.creatorName) || 'a writer'}
             {isCreator && ' (you)'}
           </span>
         </div>
@@ -103,7 +103,7 @@ function PassageList({
               <div className="flex items-baseline gap-2">
                 <span className="font-serif font-medium">{p.data.title}</span>
                 <span className="ml-auto shrink-0 text-xs text-muted-foreground">
-                  {p.data.authorName || 'a writer'} · {timeAgo(p.updatedAt)}
+                  {cleanName(p.data.authorName) || 'a writer'} · {timeAgo(p.updatedAt)}
                 </span>
               </div>
               {p.data.body && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.data.body}</p>}
@@ -135,7 +135,7 @@ function NewPassageButton({ topicId }: { topicId: string }) {
     e.preventDefault()
     setBusy(true)
     try {
-      const id = await createConfirmed({ topicId, title: title.trim(), body: '', authorName: user?.name ?? '' })
+      const id = await createConfirmed({ topicId, title: title.trim(), body: '', authorName: cleanName(user?.name) })
       navigate(`/t/${topicId}/p/${id}`)
     } catch (err) {
       error('Could not create passage', err instanceof Error ? err.message : String(err))

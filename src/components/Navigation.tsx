@@ -16,6 +16,7 @@ import { APP_NAME } from '../constants'
 import type { Role } from '../constants'
 import { nav } from '../nav'
 import { cn } from '../lib/utils'
+import { cleanName } from '../lib/lore'
 import {
   Avatar,
   AvatarFallback,
@@ -104,7 +105,7 @@ export default function Navigation() {
                       data-testid="nav-user-name"
                       className="hidden max-w-[140px] truncate text-foreground sm:inline"
                     >
-                      {user.name || user.email}
+                      {cleanName(user.name) || user.email}
                     </span>
                     <ChevronDown
                       className="h-3.5 w-3.5 text-muted-foreground transition-transform duration-150 group-data-[popup-open]:rotate-180"
@@ -116,7 +117,7 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="truncate font-medium text-foreground">
-                    {user.name || 'Signed in'}
+                    {cleanName(user.name) || 'Signed in'}
                   </div>
                   <div
                     data-testid="nav-user-email"

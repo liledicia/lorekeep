@@ -83,3 +83,27 @@ export function timeAgo(iso: string): string {
   if (s < 86400) return `${Math.floor(s / 3600)}h ago`
   return `${Math.floor(s / 86400)}d ago`
 }
+
+/**
+ * Some account names arrive double-encoded (UTF-8 bytes read as Latin-1,
+ * e.g. "LÃ©dicia" for "Lédicia"). Repair those for display; leave anything
+ * else untouched.
+ */
+export function cleanName(name?: string | null): string {
+  if (!name) return ''
+  if (!/[ÃÂ][\u0080-ÿ]/.test(name)) return name
+  try {
+    const bytes = Uint8Array.from(name, (ch) => ch.charCodeAt(0) & 0xff)
+    const fixed = new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+    return fixed
+  } catch {
+    return name
+  }
+}
+
+/** Word count that also works for Chinese/Japanese: each CJK character counts as one word. */
+export function countWords(text: string): number {
+  const cjk = text.match(/[㐀-鿿豈-﫿぀-ヿ]/g)?.length ?? 0
+  const latin = text.replace(/[㐀-鿿豈-﫿぀-ヿ]/g, ' ').trim().split(/\s+/).filter((w) => /\w/.test(w)).length
+  return cjk + latin
+}

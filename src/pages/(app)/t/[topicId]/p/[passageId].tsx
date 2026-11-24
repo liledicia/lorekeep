@@ -17,7 +17,7 @@ import { ArrowLeft, Check, Quote, RotateCcw, Sparkles, Trash2, Wand2, X } from '
 import { Badge, Button, EmptyState, Input, Textarea, useToast } from '@/components/ui'
 import { CanonPanel } from '@/components/lore/CanonPanel'
 import { SignedInOnly } from '@/components/lore/SignInPrompt'
-import { streamAi, timeAgo, type Comment, type Passage, type Topic } from '@/lib/lore'
+import { cleanName, countWords, streamAi, timeAgo, type Comment, type Passage, type Topic } from '@/lib/lore'
 
 export default function PassagePage() {
   const { topicId = '', passageId = '' } = useParams()
@@ -82,7 +82,7 @@ function Reader({ passage, updatedAt, onQuote }: { passage: Passage; updatedAt: 
     <article>
       <h1 className="font-serif text-3xl font-semibold tracking-tight">{passage.title}</h1>
       <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-        by {passage.authorName || 'a writer'} · updated {timeAgo(updatedAt)}
+        by {cleanName(passage.authorName) || 'a writer'} · updated {timeAgo(updatedAt)}
         <Badge variant="outline" size="sm">
           live
         </Badge>
@@ -180,7 +180,7 @@ function AuthorEditor({ passageId, passage }: { passageId: string; passage: Pass
     }
   }
 
-  const words = body.trim() ? body.trim().split(/\s+/).length : 0
+  const words = countWords(body)
 
   return (
     <section>
@@ -284,7 +284,7 @@ function Comments({
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!text.trim()) return
-    void create({ topicId, passageId, body: text.trim(), quote: quote || undefined, authorName: user?.name ?? '' })
+    void create({ topicId, passageId, body: text.trim(), quote: quote || undefined, authorName: cleanName(user?.name) })
     setText('')
     setQuote('')
   }
@@ -304,7 +304,7 @@ function Comments({
             )}
             <p className="whitespace-pre-wrap">{c.data.body}</p>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-              {c.data.authorName || 'a writer'} · {timeAgo(c.createdAt)}
+              {cleanName(c.data.authorName) || 'a writer'} · {timeAgo(c.createdAt)}
               {c.data.authorId === userId && (
                 <button
                   type="button"
